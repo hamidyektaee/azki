@@ -57,7 +57,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    @Transactional
+//    @Transactional
     public AccountModel getByAccountNumber(Long accountNumber) {
         Account account = getAccount(accountNumber);
         return accountMapper.toAccountModel(account);
@@ -65,7 +65,7 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Override
-    @Transactional
+//    @Transactional
     public AccountModel updateAccountBalance(AccountModel accountModel, BigDecimal amount) {
         Account account = getAccount(accountModel.getAccountNumber());
         BigDecimal totalBalance = account.getTotalBalance();

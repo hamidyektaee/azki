@@ -25,7 +25,7 @@ public class TransactionLog extends BaseEntity{
     @Column(name = "transaction_type", nullable = false)
     private TransactionType transactionType;
 
-    @NotBlank
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "financial_type", nullable = false)
     private FinancialType financialType;

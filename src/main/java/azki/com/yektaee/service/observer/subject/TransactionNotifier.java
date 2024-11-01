@@ -3,16 +3,18 @@ package azki.com.yektaee.service.observer.subject;
 import azki.com.yektaee.model.TransactionLogModel;
 import azki.com.yektaee.service.observer.obserer.TransactionObserver;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 @RequiredArgsConstructor
 public class TransactionNotifier implements TransactionSubject {
 
-    List<TransactionObserver> observerList = new ArrayList<>();
+    private List<TransactionObserver> observerList = new ArrayList<>();
 
-    private final TransactionLogModel transactionLogModel;
+    private TransactionLogModel transactionLogModel;
 
     @Override
     public void addObserver(TransactionObserver observer) {
@@ -27,5 +29,10 @@ public class TransactionNotifier implements TransactionSubject {
     @Override
     public void notifyObservers() {
         observerList.forEach(observer -> observer.update(transactionLogModel));
+    }
+
+    public void changeState(TransactionLogModel transactionLogModel) {
+        this.transactionLogModel = transactionLogModel;
+        notifyObservers();
     }
 }

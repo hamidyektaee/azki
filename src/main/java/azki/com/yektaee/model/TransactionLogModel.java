@@ -1,14 +1,14 @@
 package azki.com.yektaee.model;
 
 
-        import azki.com.yektaee.enums.FinancialType;
-        import azki.com.yektaee.enums.TransactionType;
-        import lombok.Getter;
-        import lombok.Setter;
+import azki.com.yektaee.enums.FinancialType;
+import azki.com.yektaee.enums.TransactionType;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
-public class TransactionLogModel extends BaseModel{
+public class TransactionLogModel extends BaseModel {
 
     private String accountNumber;
 

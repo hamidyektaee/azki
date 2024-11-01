@@ -11,11 +11,17 @@ import azki.com.yektaee.model.TransactionModel;
 import azki.com.yektaee.repository.TransactionRepository;
 import azki.com.yektaee.service.account.AccountService;
 import azki.com.yektaee.service.observer.obserer.TransactionLogObserver;
-import azki.com.yektaee.service.transactionlog.TransactionLogService;
+import azki.com.yektaee.service.observer.subject.TransactionNotifier;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -34,26 +40,38 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionLogMapper transactionLogMapper;
 
-    private final TransactionLogService transactionLogService;
+    private final TransactionNotifier transactionNotifier;
 
+
+    @Autowired
+    @Qualifier("transactionManager")
+    protected PlatformTransactionManager txManager;
 
     @PostConstruct
-    void init() {
-        TransactionModel model = new TransactionModel();
-        model.setTransactionType(TransactionType.DEPOSIT);
-        model.setAmount(2000.0);
-        model.setSourceAccountNumber(1L);
-        transaction(model);
-
+    private void init(){
+        TransactionTemplate tmpl = new TransactionTemplate(txManager);
+        tmpl.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                transactionNotifier.addObserver(logObserver);
+                TransactionModel model = new TransactionModel();
+                model.setTransactionType(TransactionType.DEPOSIT);
+                model.setAmount(2000.0);
+                model.setSourceAccountNumber(1L);
+//                TransactionLogModel logModel = transactionLogMapper.toTransactionLogModel(deposit(model));
+//                transactionNotifier.setTransactionLogModel(logModel);
+                transaction(model);
+            }
+        });
     }
 
+    @Transactional
     @Override
     public void transaction(TransactionModel model) {
-
         switch (model.getTransactionType()) {
             case DEPOSIT -> {
                 TransactionLogModel logModel = transactionLogMapper.toTransactionLogModel(deposit(model));
-                logObserver.update(logModel);
+                transactionNotifier.changeState(logModel);
             }
             case WITHDRAW -> {
                 TransactionLogModel logModel = transactionLogMapper.toTransactionLogModel(withdraw(model));

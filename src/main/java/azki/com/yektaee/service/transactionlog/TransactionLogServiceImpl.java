@@ -15,7 +15,6 @@ public class TransactionLogServiceImpl implements TransactionLogService {
 
     private final TransactionLogRepository transactionLogRepository;
 
-    @Override
     public void save(TransactionLogModel model) {
         TransactionLog transactionLog = transactionLogMapper.toTransactionLog(model);
         transactionLogRepository.save(transactionLog);
